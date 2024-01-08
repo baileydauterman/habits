@@ -1,0 +1,75 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Habits</PageTitle>
+
+<div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <div class="container">
+            <a class="navbar-brand" href="">Habits</a>
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="@NavMenuCssClass navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav gap-2">
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                            <span class="oi oi-home" aria-hidden="true"></span> Home
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="counter">
+                            <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="fetchdata">
+                            <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                        </NavLink>
+                    </li>
+                </ul>
+            </div>
+            <div class="justify-content-end">
+                <button type="button" class="btn btn-dark" @onclick="ToggleThemeSwitcher">
+                    <span class="oi @_themeIcon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        @Body
+    </div>
+</div>
+
+<script>
+    function setHtmlTheme(theme) {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+    }
+</script>
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    private bool _themeValue = true;
+    private string _theme => _themeValue ? "dark" : "light";
+    private string _themeIcon => _themeValue ? "oi-moon" : "oi-sun";
+
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async void ToggleThemeSwitcher()
+    {
+        _themeValue = !_themeValue;
+        await JsRuntime.InvokeVoidAsync("setHtmlTheme", _theme);
+    }
+}

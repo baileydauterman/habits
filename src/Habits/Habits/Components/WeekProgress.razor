@@ -1,0 +1,19 @@
+﻿<div class="grid-row">
+    @foreach (var day in Days)
+    {
+        <div class="grid-cell" id=@(day.ToShortDateString()) style="grid-column-start:@((int)day.DayOfWeek) grid-row-start:@(Week)">
+            <svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg">
+                <!-- Rounded corner rectangle -->
+                <rect width="8" height="8" rx="2" />
+            </svg>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DateTime[] Days { get; set; } = Array.Empty<DateTime>();
+
+    [Parameter]
+    public int Week { get; set; } = 0;
+}

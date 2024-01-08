@@ -1,0 +1,63 @@
+﻿@using Habits.Data;
+@using Microsoft.Fast.Components.FluentUI
+
+<div class="card col-sm col-md-4 m-2">
+    <div class="card-body">
+        <h5 class="card-title">@(Goal.Name)</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@(Goal.Description)</h6>
+        <div class="progress">
+            <div class="progress-bar bg-success"
+                 role="progressbar"
+                 style="width: @_currentProgress%"
+                 aria-valuenow="@_currentProgress"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+                 @_currentProgress
+             </div>
+        </div>
+
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <td scope="col">Date</td>
+                    <td scope="col">Progress</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var count = 0;
+                    var target = Goal.ProgressCheckins.Count - 1 > 4 ? Goal.ProgressCheckins.Count - 5 : -1;
+
+                    for (var i = Goal.ProgressCheckins.Count - 1; i > target; i--)
+                    {
+                        var checkin = @Goal.ProgressCheckins[i];
+                        var outputNum = checkin.Progress % 1 != 0 ?
+                                        $"{checkin.Progress:n}" :
+                                        $"{checkin.Progress:n0}";
+
+                        <tr>
+                            <td>@checkin.Date.ToShortDateString()</td>
+                            <td>@outputNum</td>
+                        </tr>
+
+                        if (count++ == 4)
+                        {
+                            break;
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer text-secondary">
+        <p>@($"{Goal.TotalProgress:n0}") of @($"{Goal.GoalValue:n0}") @(Goal.Measurement.ToString())</p>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Goal Goal { get; set; } = new Goal();
+
+    private double _currentProgress => Math.Ceiling(Goal.PercentProgress);
+}

@@ -1,0 +1,42 @@
+﻿
+<tr>
+    @{
+        var dayDataAdded = false;
+
+        foreach (var day in Days)
+        {
+            if (AddDayVariable && !dayDataAdded)
+            {
+                <td class="align-content-start">
+                    @day.ToString("ddd")&nbsp;&nbsp;
+                </td>
+                dayDataAdded = true;
+            }
+            else if (!dayDataAdded)
+            {
+                <td></td>
+                dayDataAdded = true;
+            }
+
+            <td class="dayOfWeekBox">
+                @if(day != DateTime.MinValue)
+                {
+                    <ToolTip Tip=@(day.ToShortDateString())>
+                        <!--  style="fill: #1d1f20;" (why no work??)-->
+                        <svg width="21" height="21" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="10" height="10" rx="2" />
+                        </svg>
+                    </ToolTip>
+                }
+            </td>
+        }
+    }
+</tr>
+
+@code {
+    [Parameter]
+    public IEnumerable<DateTime> Days { get; set; } = Array.Empty<DateTime>();
+
+    [Parameter]
+    public bool AddDayVariable { get; set; } = false;
+}

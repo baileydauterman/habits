@@ -1,0 +1,106 @@
+﻿@using System.Globalization;
+<h3>Progress over the last year</h3>
+
+<div class="border border-2 rounded align-content-center">
+    <table class="m-3">
+        @{
+            // var days = GetAllOfAYear(DateTime.Now.Year).ToArray();
+            var days = GetLastYear().ToArray();
+            DayOfWeek mostWeeksDay = DayOfWeek.Sunday;
+            var mostWeeks = 0;
+
+            for (var dayIndex = 0; dayIndex < 7; dayIndex++)
+            {
+                var enumValue = (DayOfWeek)dayIndex;
+                var daysOfDays = days.Where(x => x.DayOfWeek == enumValue).ToList();
+                _daysByDayOfWeek[enumValue] = daysOfDays;
+
+                if (daysOfDays.Count > mostWeeks && enumValue != DayOfWeek.Sunday)
+                {
+                    mostWeeks = daysOfDays.Count;
+                    mostWeeksDay = enumValue;
+                }
+            }
+
+            if (mostWeeksDay != DayOfWeek.Sunday)
+            {
+                foreach (var day in _daysByDayOfWeek)
+                {
+                    if (day.Key == DayOfWeek.Sunday && day.Value.Count != mostWeeks)
+                    {
+                        continue;
+                    }
+
+                    if (day.Key == mostWeeksDay)
+                    {
+                        break;
+                    }
+
+                    _daysByDayOfWeek[day.Key].Insert(0, DateTime.MinValue);
+                }
+            }
+
+            foreach (var day in _daysByDayOfWeek)
+            {
+                <DayOfWeekProgress Days=@day.Value AddDayVariable=@((int)day.Key % 2 != 0) />
+            }
+        }
+
+        <thead>
+            <tr>
+                <td></td>
+
+                @{
+                    var month = 0;
+
+                    foreach (var date in days)
+                    {
+                        if (month != date.Month)
+                        {
+                            var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(date.Month);
+                            <td class="text-center" colspan="4">@monthName</td>
+
+                            month = date.Month;
+                        }    
+                    }
+                }
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+@code {
+    private IEnumerable<DateTime> GetLastYear()
+    {
+        return GetDays(DateTime.Now.AddYears(-1).AddDays(1), DateTime.Now);
+    }
+
+    private IEnumerable<DateTime> GetCurrentYearToNow()
+    {
+        var currYear = DateTime.Now.Year;
+        return GetDays(new DateTime(currYear, 1, 1), DateTime.Now);
+    }
+
+    private IEnumerable<DateTime> GetAllOfAYear(int year)
+    {
+        return GetDays(new DateTime(year, 1, 1), new DateTime(year, 12, 31));
+    }
+
+    private IEnumerable<DateTime> GetLastMonthProgress()
+    {
+        return GetDays(DateTime.Now.AddMonths(-1), DateTime.Now);
+    }
+
+    private IEnumerable<DateTime> GetDays(DateTime start, DateTime end)
+    {
+        while (start <= end)
+        {
+            yield return start;
+            start = start.AddDays(1);
+        }
+    }
+
+    private List<DateTime> _weekDays = new List<DateTime>();
+    private Dictionary<DayOfWeek, List<DateTime>> _daysByDayOfWeek = new Dictionary<DayOfWeek, List<DateTime>>();
+}
